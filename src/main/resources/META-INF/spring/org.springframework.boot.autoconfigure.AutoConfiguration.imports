@@ -1,0 +1,3 @@
+com.example.t1projectspringbootstarter.config.CommonKafkaConfig
+com.example.t1projectspringbootstarter.config.KafkaConfig
+com.example.t1projectspringbootstarter.config.DbConfig

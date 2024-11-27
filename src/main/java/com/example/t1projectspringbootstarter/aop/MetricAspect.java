@@ -1,5 +1,7 @@
 package com.example.t1projectspringbootstarter.aop;
 
+import com.example.t1projectspringbootstarter.config.KafkaProducer;
+import com.example.t1projectspringbootstarter.dto.MetricDto;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.dto.MetricDto;
-import ru.t1.java.demo.kafka.KafkaProducer;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +37,8 @@ public class MetricAspect {
     @Value("${t1.kafka.topic.t1_demo_metrics}")
     private String topicName;
 
-    @Around("@annotation(ru.t1.java.demo.aop.Metric) || within(@ru.t1.java.demo.aop.Metric *)")
+    @Around("@annotation(com.example.t1projectspringbootstarter.aop.Metric)" +
+            " || within(@com.example.t1projectspringbootstarter.aop.Metric *)")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

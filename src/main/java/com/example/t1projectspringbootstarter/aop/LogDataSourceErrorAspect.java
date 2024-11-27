@@ -1,5 +1,8 @@
 package com.example.t1projectspringbootstarter.aop;
 
+import com.example.t1projectspringbootstarter.config.KafkaProducer;
+import com.example.t1projectspringbootstarter.dto.DataSourceErrorLog;
+import com.example.t1projectspringbootstarter.repository.DataSourceErrorLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -13,9 +16,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.kafka.KafkaProducer;
-import ru.t1.java.demo.model.DataSourceErrorLog;
-import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -38,7 +38,7 @@ public class LogDataSourceErrorAspect {
     private String topicName;
 
 
-    @Pointcut("@annotation(ru.t1.java.demo.aop.LogDataSourceError)")
+    @Pointcut("@annotation(com.example.t1projectspringbootstarter.aop.LogDataSourceError)")
     public void anyDataSourceErrorLogAnnotatedMethod() {
     }
 

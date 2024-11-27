@@ -31,5 +31,4 @@ public class LoggingAspect {
                 pJoinPoint.getSignature().toShortString(), (afterTime - beforeTime));
         return result;
     }
-
 }
