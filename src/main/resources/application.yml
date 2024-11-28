@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: t1-project-spring-boot-starter
+
+t1:
+  aop:
+    error-log: ${DATASOURCE_ERROR_LOG_ENABLED:false}
+    log-controller: ${LOG_CONTROLLER_ENABLED:false}
+    log-metric: ${LOG_METRIC_ENABLED:false}
+  kafka:
+    enabled: ${KAFKA_ENABLED:false}
+    max-poll-interval-ms: ${KAFKA_MAX_POLL_INTERVAL_MS:3000}
+    max-partition-fetch-bytes: 300000
+    session-timeout-ms: 60000
+    producer:
+      enable: ${KAFKA_PRODUCER_ENABLED:false}
+    topic:
+      client_id_registered: ${KAFKA_CLIENT_REGISTERED_TOPIC:t1_demo_client_registered}
+      t1_demo_metrics: ${KAFKA_METRICS_TOPIC:t1_demo_metrics}

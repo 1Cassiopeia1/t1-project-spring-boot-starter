@@ -18,5 +18,5 @@ public interface ClientFeign {
     @GetMapping("/block")
 
     ResponseEntity<Boolean> isClientAccountsBlocked(
-            @RequestParam Long clientId, @RequestParam List<Long> accountIds);
+            @RequestParam Long clientId, @RequestParam Long accountId);
 }

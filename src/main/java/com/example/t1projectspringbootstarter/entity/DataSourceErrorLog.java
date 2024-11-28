@@ -1,4 +1,4 @@
-package com.example.t1projectspringbootstarter.dto;
+package com.example.t1projectspringbootstarter.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
@@ -19,6 +20,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @Table(name = "data_source_error_log")
 public class DataSourceErrorLog {
 

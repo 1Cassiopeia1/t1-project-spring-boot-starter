@@ -1,7 +1,7 @@
 package com.example.t1projectspringbootstarter.aop;
 
 import com.example.t1projectspringbootstarter.config.KafkaProducer;
-import com.example.t1projectspringbootstarter.dto.DataSourceErrorLog;
+import com.example.t1projectspringbootstarter.entity.DataSourceErrorLog;
 import com.example.t1projectspringbootstarter.repository.DataSourceErrorLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,8 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,8 @@ import java.util.concurrent.ExecutionException;
 @Component
 @Order(1)
 @RequiredArgsConstructor
+@ConditionalOnBean({DataSourceErrorLogRepository.class, KafkaProducer.class})
+@ConditionalOnProperty(value = "t1.aop.error-log", havingValue = "true")
 public class LogDataSourceErrorAspect {
 
     private static final String LINE_BREAK = "\n";

@@ -12,6 +12,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,8 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @RequiredArgsConstructor
 @Order(1)
+@ConditionalOnBean({KafkaProducer.class, MeterRegistry.class})
+@ConditionalOnProperty(value = "t1.aop.log-metric", havingValue = "true")
 public class MetricAspect {
 
     private static final String HEADER_ERROR_NAME = "Error-Name";

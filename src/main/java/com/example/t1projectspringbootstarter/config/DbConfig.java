@@ -1,17 +1,19 @@
 package com.example.t1projectspringbootstarter.config;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.sql.DataSource;
 
-@AutoConfiguration
-@ConditionalOnProperty("spring.datasource.url")
-@EntityScan("com.example.t1projectspringbootstarter")
-@EnableJpaRepositories("com.example.t1projectspringbootstarter")
-@ConditionalOnBean(DataSource.class)
+@Import(StarterEntityRegistrar.class)
+@ConditionalOnClass(DataSource.class)
+@ConditionalOnProperty(value = "t1.aop.error-log", havingValue = "true")
+@AutoConfigureBefore({JpaRepositoriesAutoConfiguration.class, LiquibaseAutoConfiguration.class})
+@EnableJpaRepositories(basePackages = "com.example.t1projectspringbootstarter.repository")
 public class DbConfig {
 }

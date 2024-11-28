@@ -19,9 +19,11 @@ public class KafkaProducer<T> {
     private final KafkaTemplate<String, T> kafkaJsonTemplate;
     @Value("${t1.kafka.enabled}")
     private Boolean isKafkaEnabled;
+    @Value("${t1.kafka.producer.enable}")
+    private Boolean isKafkaProducerEnabled;
 
     public void send(T o) {
-        if (!Boolean.FALSE.equals(isKafkaEnabled)) {
+        if (!Boolean.FALSE.equals(isKafkaEnabled) && !Boolean.FALSE.equals(isKafkaProducerEnabled)) {
             try {
                 kafkaJsonTemplate.sendDefault(UUID.randomUUID().toString(), o).get();
             } catch (Exception ex) {
@@ -33,7 +35,7 @@ public class KafkaProducer<T> {
     }
 
     public CompletableFuture<SendResult<String, T>> sendTo(String topic, T value, List<Header> headers) {
-        if (!Boolean.FALSE.equals(isKafkaEnabled)) {
+        if (!Boolean.FALSE.equals(isKafkaEnabled) && !Boolean.FALSE.equals(isKafkaProducerEnabled)) {
             try {
                 ProducerRecord<String, T> message = new ProducerRecord<>(topic, null, UUID.randomUUID().toString(), value, headers);
                 return kafkaJsonTemplate.send(message);
