@@ -1,4 +1,4 @@
-package com.example.t1projectspringbootstarter.dto;
+package com.example.t1projectspringbootstarter.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

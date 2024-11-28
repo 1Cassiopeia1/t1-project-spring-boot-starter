@@ -1,0 +1,53 @@
+{
+  "properties": [
+    {
+      "name": "t1.kafka.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables kafka consumer and producer."
+    },
+    {
+      "name": "t1.kafka.producer.enable",
+      "type": "java.lang.Boolean",
+      "description": "Enables kafka producer."
+    },
+    {
+      "name": "t1.kafka.session-timeout-ms",
+      "type": "java.lang.String",
+      "description": "Defines the timeout in ms for kafka session."
+    },
+    {
+      "name": "t1.kafka.max-partition-fetch-bytes",
+      "type": "java.lang.String",
+      "description": "Defines the max value in bytes for kafka partition."
+    },
+    {
+      "name": "t1.kafka.max-poll-interval-ms",
+      "type": "java.lang.String",
+      "description": "Defines max poll interval in ms for kafka."
+    },
+    {
+      "name": "t1.kafka.topic.t1_demo_metrics",
+      "type": "java.lang.String",
+      "description": "Describes the name for kafka topic t1_demo_metrics."
+    },
+    {
+      "name": "t1.aop.error-log",
+      "type": "java.lang.Boolean",
+      "description": "Enable/disable aspect error log and checks the existence of database table."
+    },
+    {
+      "name": "t1.aop.log-controller",
+      "type": "java.lang.Boolean",
+      "description": "Enable/disable the logging aspect."
+    },
+    {
+      "name": "t1.aop.log-metric",
+      "type": "java.lang.Boolean",
+      "description": "Enable/disable the counting method's execution time aspect."
+    },
+    {
+      "name": "services.client-service.url",
+      "type": "java.lang.String",
+      "description": "Defines the url for client service."
+    }
+  ] }

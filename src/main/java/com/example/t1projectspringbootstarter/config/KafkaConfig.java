@@ -1,8 +1,6 @@
 package com.example.t1projectspringbootstarter.config;
 
-import com.example.t1projectspringbootstarter.dto.AccountDto;
 import com.example.t1projectspringbootstarter.dto.ClientDto;
-import com.example.t1projectspringbootstarter.dto.TransactionDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
@@ -22,6 +21,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -41,7 +41,8 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "t1")
-@AutoConfigureAfter({KafkaAutoConfiguration.class, CommonKafkaConfig.class})
+@AutoConfigureAfter(CommonKafkaConfig.class)
+@AutoConfigureBefore(KafkaAutoConfiguration.class)
 public class KafkaConfig<T> {
 
     @Value("${t1.kafka.session-timeout-ms:15000}")
@@ -50,13 +51,11 @@ public class KafkaConfig<T> {
     private String maxPartitionFetchBytes;
     @Value("${t1.kafka.max-poll-interval-ms:3000}")
     private String maxPollIntervalsMs;
-    @Value("${t1.kafka.topic.client_id_registered}")
-    private String clientTopic;
     @NestedConfigurationProperty
     private KafkaProperties kafka = new KafkaProperties();
 
     @Bean
-    @ConditionalOnMissingBean(KafkaAdmin.class)
+    @ConditionalOnMissingBean
     @ConditionalOnProperty(value = "t1.kafka.enabled", havingValue = "true", matchIfMissing = true)
     public KafkaAdmin commonKafkaAdmin(ObjectProvider<SslBundles> sslBundles) {
         var adminProperties = this.kafka.buildAdminProperties(sslBundles.getIfAvailable());
@@ -64,7 +63,7 @@ public class KafkaConfig<T> {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = ConcurrentKafkaListenerContainerFactory.class, name = "clientKafkaListenerContainerFactory")
+    @ConditionalOnMissingBean(KafkaListenerContainerFactory.class)
     @ConditionalOnProperty(value = "t1.kafka.enabled", havingValue = "true", matchIfMissing = true)
     public ConcurrentKafkaListenerContainerFactory<String, ClientDto> clientKafkaListenerContainerFactory(
             ObjectProvider<SslBundles> sslBundles, RecordMessageConverter recordMessageConverter) {
@@ -80,31 +79,21 @@ public class KafkaConfig<T> {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = ConcurrentKafkaListenerContainerFactory.class, name = "accountKafkaListenerContainerFactory")
-    @ConditionalOnProperty(value = "t1.kafka.enabled", havingValue = "true", matchIfMissing = true)
-    public ConcurrentKafkaListenerContainerFactory<String, AccountDto> accountKafkaListenerContainerFactory(
+    @ConditionalOnProperty(value = {"t1.kafka.enabled"}, havingValue = "true", matchIfMissing = true)
+    public ConcurrentKafkaListenerContainerFactory<String, T> kafkaListenerContainerFactory(
             ObjectProvider<SslBundles> sslBundles, RecordMessageConverter recordMessageConverter) {
         Map<String, Object> consumerProperties = kafka.buildConsumerProperties(sslBundles.getIfAvailable());
-        ConsumerFactory<String, AccountDto> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties);
-        ConcurrentKafkaListenerContainerFactory<String, AccountDto> containerFactory = new ConcurrentKafkaListenerContainerFactory<>();
+        consumerProperties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeout);
+        consumerProperties.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
+        consumerProperties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalsMs);
+        ConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties);
+        ConcurrentKafkaListenerContainerFactory<String, T> containerFactory = new ConcurrentKafkaListenerContainerFactory<>();
         fillContainerFactory(recordMessageConverter, containerFactory, consumerFactory);
         return containerFactory;
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = ConcurrentKafkaListenerContainerFactory.class, name = "transactionKafkaListenerContainerFactory")
-    @ConditionalOnProperty(value = {"t1.kafka.enabled", "t1.kafka.producer.enable"}, havingValue = "true", matchIfMissing = true)
-    public ConcurrentKafkaListenerContainerFactory<String, TransactionDto> transactionKafkaListenerContainerFactory(
-            ObjectProvider<SslBundles> sslBundles, RecordMessageConverter recordMessageConverter) {
-        Map<String, Object> consumerProperties = kafka.buildConsumerProperties(sslBundles.getIfAvailable());
-        ConsumerFactory<String, TransactionDto> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties);
-        ConcurrentKafkaListenerContainerFactory<String, TransactionDto> containerFactory = new ConcurrentKafkaListenerContainerFactory<>();
-        fillContainerFactory(recordMessageConverter, containerFactory, consumerFactory);
-        return containerFactory;
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = {"t1.kafka.enabled", "t1.kafka.producer.enable"}, havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(value = {"t1.kafka.enabled"}, havingValue = "true", matchIfMissing = true)
     public KafkaTemplate<String, T> kafkaTemplate(ObjectProvider<SslBundles> sslBundles) {
         Map<String, Object> props = getProducerProperties(sslBundles);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ToStringSerializer.class);
@@ -113,15 +102,12 @@ public class KafkaConfig<T> {
     }
 
     @Bean
-    @ConditionalOnProperty(value = {"t1.kafka.enabled", "t1.kafka.producer.enable"}, havingValue = "true", matchIfMissing = true)
     public KafkaTemplate<String, T> kafkaJsonTemplate(ObjectProvider<SslBundles> sslBundles) {
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(getProducerProperties(sslBundles)));
     }
 
     @Bean
-    @ConditionalOnProperty(value = {"t1.kafka.enabled", "t1.kafka.producer.enable"}, havingValue = "true", matchIfMissing = true)
     public KafkaProducer<T> producerClient(@Qualifier("kafkaJsonTemplate") KafkaTemplate<String, T> template) {
-        template.setDefaultTopic(clientTopic);
         return new KafkaProducer<>(template);
     }
 
