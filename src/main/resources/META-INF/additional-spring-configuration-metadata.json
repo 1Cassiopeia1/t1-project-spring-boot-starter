@@ -48,6 +48,11 @@
     {
       "name": "services.client-service.url",
       "type": "java.lang.String",
-      "description": "Defines the url for client service."
+      "description": "Unlocks clients."
+    },
+    {
+      "name": "services.unlock-service.url",
+      "type": "java.lang.String",
+      "description": "Unlocks service."
     }
   ] }
